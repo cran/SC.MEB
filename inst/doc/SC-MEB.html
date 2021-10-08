@@ -30,45 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-<style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
-</style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
-  }
-
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
-});
-</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -80,7 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
     </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 code.sourceCode > span { display: inline-block; line-height: 1.25; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -168,6 +136,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -367,18 +336,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<div id="introduction" class="section level3">
-<h3>Introduction</h3>
+<div id="install-the-sc.meb" class="section level2">
+<h2>Install the SC.MEB</h2>
 <p>This vignette provides an introduction to the R package <code>SC.MEB</code>, where the function <code>SC.MEB</code> implements the model <code>SC-MEB</code>, spatial clustering with hidden Markov random field using empirical Bayes. The package can be installed with the command:</p>
+<p><code>library(devtools)</code></p>
+<p><code>install_github(&quot;Shufeyangyi2015310117/SC.MEB&quot;)</code></p>
 <p>The package can be loaded with the command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;SC.MEB&quot;</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="co">#&gt; Loading required package: mclust</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">#&gt; Warning: package &#39;mclust&#39; was built under R version 4.0.4</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">#&gt; Package &#39;mclust&#39; version 5.4.7</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co">#&gt; Type &#39;citation(&quot;mclust&quot;)&#39; for citing this R package in publications.</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;SC.MEB&quot;</span>)</span></code></pre></div>
 </div>
-<div id="fit-sc-meb-using-simulated-data" class="section level3">
-<h3>Fit SC-MEB using simulated data</h3>
+<div id="fit-sc-meb-using-simulated-data" class="section level2">
+<h2>Fit SC-MEB using simulated data</h2>
+<div id="generating-the-simulated-data" class="section level3">
+<h3>Generating the simulated data</h3>
 <p>We first set the basic parameter:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(mvtnorm)</span>
 <span id="cb2-2"><a href="#cb2-2"></a><span class="kw">library</span>(GiRaF)</span>
@@ -393,377 +362,118 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb2-11"><a href="#cb2-11"></a>               <span class="kw">c</span>(<span class="dv">6</span>, <span class="kw">rep</span>(<span class="fl">1.5</span>, <span class="dv">14</span>)),</span>
 <span id="cb2-12"><a href="#cb2-12"></a>               <span class="kw">c</span>(<span class="kw">rep</span>(<span class="op">-</span><span class="fl">1.5</span>, <span class="dv">7</span>), <span class="kw">rep</span>(<span class="fl">1.5</span>, <span class="dv">7</span>), <span class="dv">6</span>),</span>
 <span id="cb2-13"><a href="#cb2-13"></a>               <span class="kw">c</span>(<span class="kw">rep</span>(<span class="fl">1.5</span>, <span class="dv">7</span>), <span class="kw">rep</span>(<span class="op">-</span><span class="fl">1.5</span>, <span class="dv">7</span>), <span class="dv">-6</span>)), <span class="dt">ncol =</span> KK)</span>
-<span id="cb2-14"><a href="#cb2-14"></a>height &lt;-<span class="st"> </span><span class="dv">50</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>width &lt;-<span class="st"> </span><span class="dv">50</span></span>
+<span id="cb2-14"><a href="#cb2-14"></a>height &lt;-<span class="st"> </span><span class="dv">70</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a>width &lt;-<span class="st"> </span><span class="dv">70</span></span>
 <span id="cb2-16"><a href="#cb2-16"></a>n &lt;-<span class="st"> </span>height <span class="op">*</span><span class="st"> </span>width <span class="co"># # of cell in each indviduals</span></span></code></pre></div>
 <p>Then, we generate the true clustering label, 15-dimensional PCA and position of each spot.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>  X &lt;-<span class="st"> </span><span class="kw">sampler.mrf</span>(<span class="dt">iter =</span> n, <span class="dt">sampler =</span> <span class="st">&quot;Gibbs&quot;</span>, <span class="dt">h =</span> height, <span class="dt">w =</span> width, <span class="dt">ncolors =</span> KK, </span>
-<span id="cb3-2"><a href="#cb3-2"></a>                   <span class="dt">nei =</span> G, <span class="dt">param =</span> Bet,<span class="dt">initialise =</span> <span class="ot">FALSE</span>, <span class="dt">view =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>  x &lt;-<span class="st"> </span><span class="kw">c</span>(X) <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>  y &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, <span class="dt">nrow =</span> n, <span class="dt">ncol =</span> p)</span>
-<span id="cb4-3"><a href="#cb4-3"></a></span>
-<span id="cb4-4"><a href="#cb4-4"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n) { <span class="co"># cell</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a>    mu_i &lt;-<span class="st"> </span>mu[, x[i]]</span>
-<span id="cb4-6"><a href="#cb4-6"></a>    Sigma_i &lt;-<span class="st"> </span>((x[i]<span class="op">==</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>(x[i]<span class="op">==</span><span class="dv">2</span>)<span class="op">*</span><span class="fl">2.5</span> <span class="op">+</span><span class="st"> </span>(x[i]<span class="op">==</span><span class="dv">3</span>)<span class="op">*</span><span class="dv">3</span> <span class="op">+</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="st">                  </span>(x[i]<span class="op">==</span><span class="dv">4</span>)<span class="op">*</span><span class="fl">3.5</span> <span class="op">+</span><span class="st"> </span>(x[i]<span class="op">==</span><span class="dv">5</span>)<span class="op">*</span><span class="dv">4</span>)<span class="op">*</span><span class="kw">diag</span>(<span class="dv">1</span>, p)<span class="op">*</span><span class="dv">4</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a>    y[i, ] &lt;-<span class="st"> </span><span class="kw">rmvnorm</span>(<span class="dv">1</span>, mu_i, Sigma_i)</span>
-<span id="cb4-9"><a href="#cb4-9"></a>  }</span>
-<span id="cb4-10"><a href="#cb4-10"></a></span>
-<span id="cb4-11"><a href="#cb4-11"></a>  pos &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>height, width), <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>height, <span class="dt">each=</span>width))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>X &lt;-<span class="st"> </span><span class="kw">sampler.mrf</span>(<span class="dt">iter =</span> n, <span class="dt">sampler =</span> <span class="st">&quot;Gibbs&quot;</span>, <span class="dt">h =</span> height, <span class="dt">w =</span> width, <span class="dt">ncolors =</span> KK, <span class="dt">nei =</span> G, <span class="dt">param =</span> Bet,<span class="dt">initialise =</span> <span class="ot">FALSE</span>, <span class="dt">view =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>x &lt;-<span class="st"> </span><span class="kw">c</span>(X) <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>y &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, <span class="dt">nrow =</span> n, <span class="dt">ncol =</span> p)</span>
+<span id="cb3-4"><a href="#cb3-4"></a></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n)   { <span class="co"># cell</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>  mu_i &lt;-<span class="st"> </span>mu[, x[i]]</span>
+<span id="cb3-7"><a href="#cb3-7"></a>  Sigma_i &lt;-<span class="st"> </span>((x[i]<span class="op">==</span><span class="dv">1</span>)<span class="op">*</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span>(x[i]<span class="op">==</span><span class="dv">2</span>)<span class="op">*</span><span class="fl">2.5</span> <span class="op">+</span><span class="st"> </span>(x[i]<span class="op">==</span><span class="dv">3</span>)<span class="op">*</span><span class="dv">3</span> <span class="op">+</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="st">                </span>(x[i]<span class="op">==</span><span class="dv">4</span>)<span class="op">*</span><span class="fl">3.5</span> <span class="op">+</span><span class="st"> </span>(x[i]<span class="op">==</span><span class="dv">5</span>)<span class="op">*</span><span class="dv">4</span>)<span class="op">*</span><span class="kw">diag</span>(<span class="dv">1</span>, p)<span class="op">*</span><span class="fl">0.3</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>  y[i, ] &lt;-<span class="st"> </span><span class="kw">rmvnorm</span>(<span class="dv">1</span>, mu_i, Sigma_i)</span>
+<span id="cb3-10"><a href="#cb3-10"></a>}</span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a>pos &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>height, width), <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>height, <span class="dt">each=</span>width))</span></code></pre></div>
 <p>Subsequently, we construct the SingleCellExperiment object based on the above PCA and position.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>  <span class="co"># -------------------------------------------------</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>  <span class="co"># make BayesSpace metadata used in BayesSpace</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a>  counts &lt;-<span class="st"> </span><span class="kw">t</span>(y)</span>
-<span id="cb5-4"><a href="#cb5-4"></a>  <span class="kw">rownames</span>(counts) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;gene_&quot;</span>, <span class="kw">seq_len</span>(p))</span>
-<span id="cb5-5"><a href="#cb5-5"></a>  <span class="kw">colnames</span>(counts) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;spot_&quot;</span>, <span class="kw">seq_len</span>(n))</span>
-<span id="cb5-6"><a href="#cb5-6"></a></span>
-<span id="cb5-7"><a href="#cb5-7"></a>  <span class="co">## Make array coordinates - filled rectangle</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a>  cdata &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
-<span id="cb5-9"><a href="#cb5-9"></a>  nrow &lt;-<span class="st"> </span>height; ncol &lt;-<span class="st"> </span>width</span>
-<span id="cb5-10"><a href="#cb5-10"></a>  cdata<span class="op">$</span>row &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">seq_len</span>(nrow), <span class="dt">each=</span>ncol)</span>
-<span id="cb5-11"><a href="#cb5-11"></a>  cdata<span class="op">$</span>col &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">seq_len</span>(ncol), nrow)</span>
-<span id="cb5-12"><a href="#cb5-12"></a>  cdata &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">do.call</span>(cbind, cdata))</span>
-<span id="cb5-13"><a href="#cb5-13"></a>  <span class="co">## Scale and jitter image coordinates</span></span>
-<span id="cb5-14"><a href="#cb5-14"></a>  <span class="co">#scale.factor &lt;- rnorm(1, 8);  n_spots &lt;- n</span></span>
-<span id="cb5-15"><a href="#cb5-15"></a>  <span class="co">#cdata$imagerow &lt;- scale.factor * cdata$row + rnorm(n_spots)</span></span>
-<span id="cb5-16"><a href="#cb5-16"></a>  <span class="co">#cdata$imagecol &lt;- scale.factor * cdata$col + rnorm(n_spots)</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a>  cdata<span class="op">$</span>imagerow &lt;-<span class="st"> </span>cdata<span class="op">$</span>row</span>
-<span id="cb5-18"><a href="#cb5-18"></a>  cdata<span class="op">$</span>imagecol &lt;-<span class="st"> </span>cdata<span class="op">$</span>col</span>
-<span id="cb5-19"><a href="#cb5-19"></a>  <span class="co">## Make SCE</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a>  <span class="co">## note: scater::runPCA throws warning on our small sim data, so use prcomp</span></span>
-<span id="cb5-21"><a href="#cb5-21"></a>  sce &lt;-<span class="st"> </span><span class="kw">SingleCellExperiment</span>(<span class="dt">assays=</span><span class="kw">list</span>(<span class="dt">counts=</span>counts), <span class="dt">colData=</span>cdata)</span>
-<span id="cb5-22"><a href="#cb5-22"></a>  <span class="kw">reducedDim</span>(sce, <span class="st">&quot;PCA&quot;</span>) &lt;-<span class="st"> </span>y</span>
-<span id="cb5-23"><a href="#cb5-23"></a>  <span class="co"># sce$spatial.cluster &lt;- floor(runif(ncol(sce), 1, 3))</span></span>
-<span id="cb5-24"><a href="#cb5-24"></a></span>
-<span id="cb5-25"><a href="#cb5-25"></a>  <span class="kw">metadata</span>(sce)<span class="op">$</span>BayesSpace.data &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
-<span id="cb5-26"><a href="#cb5-26"></a>  <span class="kw">metadata</span>(sce)<span class="op">$</span>BayesSpace.data<span class="op">$</span>platform &lt;-<span class="st"> &quot;ST&quot;</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a>  <span class="kw">metadata</span>(sce)<span class="op">$</span>BayesSpace.data<span class="op">$</span>is.enhanced &lt;-<span class="st"> </span><span class="ot">FALSE</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># -------------------------------------------------</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co"># make SC-MEB metadata used in SC-MEB</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>counts &lt;-<span class="st"> </span><span class="kw">t</span>(y)</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="kw">rownames</span>(counts) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;gene_&quot;</span>, <span class="kw">seq_len</span>(p))</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="kw">colnames</span>(counts) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;spot_&quot;</span>, <span class="kw">seq_len</span>(n))</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">## Make array coordinates - filled rectangle</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>cdata &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb4-9"><a href="#cb4-9"></a>nrow &lt;-<span class="st"> </span>height; ncol &lt;-<span class="st"> </span>width</span>
+<span id="cb4-10"><a href="#cb4-10"></a>cdata<span class="op">$</span>row &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">seq_len</span>(nrow), <span class="dt">each=</span>ncol)</span>
+<span id="cb4-11"><a href="#cb4-11"></a>cdata<span class="op">$</span>col &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="kw">seq_len</span>(ncol), nrow)</span>
+<span id="cb4-12"><a href="#cb4-12"></a>cdata &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">do.call</span>(cbind, cdata))</span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">## Scale and jitter image coordinates</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">#scale.factor &lt;- rnorm(1, 8);  n_spots &lt;- n</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="co">#cdata$imagerow &lt;- scale.factor * cdata$row + rnorm(n_spots)</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#cdata$imagecol &lt;- scale.factor * cdata$col + rnorm(n_spots)</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>cdata<span class="op">$</span>imagerow &lt;-<span class="st"> </span>cdata<span class="op">$</span>row</span>
+<span id="cb4-18"><a href="#cb4-18"></a>cdata<span class="op">$</span>imagecol &lt;-<span class="st"> </span>cdata<span class="op">$</span>col</span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">## Make SCE</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">## note: scater::runPCA throws warning on our small sim data, so use prcomp</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>sce &lt;-<span class="st"> </span><span class="kw">SingleCellExperiment</span>(<span class="dt">assays=</span><span class="kw">list</span>(<span class="dt">counts=</span>counts), <span class="dt">colData=</span>cdata)</span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="kw">reducedDim</span>(sce, <span class="st">&quot;PCA&quot;</span>) &lt;-<span class="st"> </span>y</span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co"># sce$spatial.cluster &lt;- floor(runif(ncol(sce), 1, 3))</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="kw">metadata</span>(sce)<span class="op">$</span>SCMEB.data &lt;-<span class="st"> </span><span class="kw">list</span>()</span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="kw">metadata</span>(sce)<span class="op">$</span>SCMEB.data<span class="op">$</span>platform &lt;-<span class="st"> &quot;ST&quot;</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="kw">metadata</span>(sce)<span class="op">$</span>SCMEB.data<span class="op">$</span>is.enhanced &lt;-<span class="st"> </span><span class="ot">FALSE</span></span></code></pre></div>
+</div>
+<div id="fitting-the-sc-meb" class="section level3">
+<h3>Fitting the SC-MEB</h3>
 <p>Here, we set the basic paramters for our function <code>SC.MEB</code></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>singlece =<span class="st"> </span>sce</span>
-<span id="cb6-2"><a href="#cb6-2"></a>d =<span class="st"> </span><span class="dv">15</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a>K =<span class="st"> </span><span class="dv">4</span><span class="op">:</span><span class="dv">6</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>bet =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">5</span>,<span class="dv">1</span>)</span>
-<span id="cb6-5"><a href="#cb6-5"></a>platform =<span class="st"> &quot;ST&quot;</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a>maxIter_ICM =<span class="st"> </span><span class="dv">10</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>maxIter =<span class="st"> </span><span class="dv">50</span></span></code></pre></div>
-<p>Here, we briefly explain these parameters. ‘singlece’ is a SingleCellExperiment object containing PCA and position informatin. ‘d’ is a integer specifying the dimension of PCA. The default is 15. ‘K’ is an integer vector specifying the numbers of mixture components (clusters) for which the BIC is to be calculated. The default is K = 2:9. ‘platform’ is the name of spatial transcriptomic platform. Specify ‘Visium’ for hex lattice geometry or ‘ST’ for square lattice geometry. Specifying this parameter is optional as this information is included in their metadata. ‘bet’ is a numeric vector specifying the smoothness of Random Markov Field. The default is seq(0,5,0.2). ‘maxIter_ICM’ is the maximum iteration of ICM algorithm. The default is 10. ‘maxIter’ is the maximum iteration of EM algorithm. The default is 50.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>platform =<span class="st"> &quot;ST&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>beta_grid =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">4</span>,<span class="fl">0.2</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>K_set=<span class="st"> </span><span class="dv">2</span><span class="op">:</span><span class="dv">10</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>parallel=<span class="ot">TRUE</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>num_core =<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>PX =<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>maxIter_ICM =<span class="st"> </span><span class="dv">10</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>maxIter =<span class="st"> </span><span class="dv">50</span></span></code></pre></div>
+<p>Here, we briefly explain these parameters.</p>
+<p>‘parallel’ is a logical value specifing the run the model in parallel. The default is TRUE.</p>
+<p>‘num_core’ is a interger value for the number of cores used for parallel. The default is 5.</p>
+<p>‘PX’ is a logical value for paramter expansion in EM algorithm. The default is True.</p>
+<p>‘K_set’ is an integer vector specifying the numbers of mixture components (clusters) for which the BIC is to be calculated. The default is K = 2:10.</p>
+<p>‘platform’ is the name of spatial transcriptomic platform. Specify ‘Visium’ for hex lattice geometry or ‘ST’ for square lattice geometry. Specifying this parameter is optional as this information is included in their metadata.</p>
+<p>‘beta_grid’ is a numeric vector specifying the smoothness of Random Markov Field. The default is seq(0,5,0.2).</p>
+<p>‘maxIter_ICM’ is the maximum iteration of ICM algorithm. The default is 10.</p>
+<p>‘maxIter’ is the maximum iteration of EM algorithm. The default is 50.</p>
+<div id="calculating-the-neighborhood" class="section level4">
+<h4>Calculating the neighborhood</h4>
+<p>First, we require to find the neighborhood</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>Adj_sp &lt;-<span class="st"> </span><span class="kw">getneighborhood_fast</span>(<span class="kw">as.matrix</span>(pos), <span class="dt">cutoff =</span> <span class="fl">1.2</span>)</span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>Adj_sp &lt;-<span class="st"> </span><span class="kw">find_neighbors2</span>(sce, <span class="dt">platform =</span> platform)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>Adj_sp[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>]</span></code></pre></div>
+<p>The output ‘Adj_sp’ is a sparse matrix to describe the neighorhood. There two functions are both used to calculate the nrighborhood. The first function ‘getneighobrhood_fast’ is a general function used for general data. However, the second function ‘find_neighbors2’ is a specific function for ST and Visium data.</p>
+</div>
+<div id="run-the-sc-meb-in-parallel" class="section level4">
+<h4>Run the SC-MEB in parallel</h4>
 <p>Finally, we run our model <code>SC-MEB</code> by the function <code>SC.MEB</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>out =<span class="st"> </span><span class="kw">SC.MEB</span>(<span class="dt">sce =</span> singlece, <span class="dt">d =</span> d, <span class="dt">K=</span>K, <span class="dt">bet=</span>bet, <span class="dt">platform =</span> platform, </span>
-<span id="cb7-2"><a href="#cb7-2"></a>             <span class="dt">maxIter_ICM =</span> maxIter_ICM, <span class="dt">maxIter =</span> maxIter)</span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt; Neighbors were identified for 2500 out of 2500 spots.</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt; diff Energy = 2.964219</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt; diff Energy = 7.248896</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; diff Energy = 1.459156</span></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; ICM Converged at Iteration = 5</span></span>
-<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; diff Energy = 2.387050</span></span>
-<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; ICM Converged at Iteration = 3</span></span>
-<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt; diff Energy = 1.500000</span></span>
-<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt; diff Energy = 5.500000</span></span>
-<span id="cb7-18"><a href="#cb7-18"></a><span class="co">#&gt; diff Energy = 28.389259</span></span>
-<span id="cb7-19"><a href="#cb7-19"></a><span class="co">#&gt; diff Energy = 24.379114</span></span>
-<span id="cb7-20"><a href="#cb7-20"></a><span class="co">#&gt; diff Energy = 26.922362</span></span>
-<span id="cb7-21"><a href="#cb7-21"></a><span class="co">#&gt; diff Energy = 12.987930</span></span>
-<span id="cb7-22"><a href="#cb7-22"></a><span class="co">#&gt; diff Energy = 16.038074</span></span>
-<span id="cb7-23"><a href="#cb7-23"></a><span class="co">#&gt; diff Energy = 18.050068</span></span>
-<span id="cb7-24"><a href="#cb7-24"></a><span class="co">#&gt; diff Energy = 20.026207</span></span>
-<span id="cb7-25"><a href="#cb7-25"></a><span class="co">#&gt; diff Energy = 19.036880</span></span>
-<span id="cb7-26"><a href="#cb7-26"></a><span class="co">#&gt; diff Energy = 63.693378</span></span>
-<span id="cb7-27"><a href="#cb7-27"></a><span class="co">#&gt; diff Energy = 67.233236</span></span>
-<span id="cb7-28"><a href="#cb7-28"></a><span class="co">#&gt; diff Energy = 29.418232</span></span>
-<span id="cb7-29"><a href="#cb7-29"></a><span class="co">#&gt; diff Energy = 44.952632</span></span>
-<span id="cb7-30"><a href="#cb7-30"></a><span class="co">#&gt; diff Energy = 21.305055</span></span>
-<span id="cb7-31"><a href="#cb7-31"></a><span class="co">#&gt; diff Energy = 53.354939</span></span>
-<span id="cb7-32"><a href="#cb7-32"></a><span class="co">#&gt; diff Energy = 49.944247</span></span>
-<span id="cb7-33"><a href="#cb7-33"></a><span class="co">#&gt; diff Energy = 62.416177</span></span>
-<span id="cb7-34"><a href="#cb7-34"></a><span class="co">#&gt; diff Energy = 69.183096</span></span>
-<span id="cb7-35"><a href="#cb7-35"></a><span class="co">#&gt; diff Energy = 77.268544</span></span>
-<span id="cb7-36"><a href="#cb7-36"></a><span class="co">#&gt; diff Energy = 77.911172</span></span>
-<span id="cb7-37"><a href="#cb7-37"></a><span class="co">#&gt; diff Energy = 73.760339</span></span>
-<span id="cb7-38"><a href="#cb7-38"></a><span class="co">#&gt; diff Energy = 98.626957</span></span>
-<span id="cb7-39"><a href="#cb7-39"></a><span class="co">#&gt; diff Energy = 118.154632</span></span>
-<span id="cb7-40"><a href="#cb7-40"></a><span class="co">#&gt; diff Energy = 81.667565</span></span>
-<span id="cb7-41"><a href="#cb7-41"></a><span class="co">#&gt; diff Energy = 41.437990</span></span>
-<span id="cb7-42"><a href="#cb7-42"></a><span class="co">#&gt; diff Energy = 49.620391</span></span>
-<span id="cb7-43"><a href="#cb7-43"></a><span class="co">#&gt; diff Energy = 49.388027</span></span>
-<span id="cb7-44"><a href="#cb7-44"></a><span class="co">#&gt; diff Energy = 37.440839</span></span>
-<span id="cb7-45"><a href="#cb7-45"></a><span class="co">#&gt; diff Energy = 28.246270</span></span>
-<span id="cb7-46"><a href="#cb7-46"></a><span class="co">#&gt; diff Energy = 27.679502</span></span>
-<span id="cb7-47"><a href="#cb7-47"></a><span class="co">#&gt; diff Energy = 18.885296</span></span>
-<span id="cb7-48"><a href="#cb7-48"></a><span class="co">#&gt; diff Energy = 27.592693</span></span>
-<span id="cb7-49"><a href="#cb7-49"></a><span class="co">#&gt; diff Energy = 41.402540</span></span>
-<span id="cb7-50"><a href="#cb7-50"></a><span class="co">#&gt; diff Energy = 44.703886</span></span>
-<span id="cb7-51"><a href="#cb7-51"></a><span class="co">#&gt; diff Energy = 32.473432</span></span>
-<span id="cb7-52"><a href="#cb7-52"></a><span class="co">#&gt; diff Energy = 83.150778</span></span>
-<span id="cb7-53"><a href="#cb7-53"></a><span class="co">#&gt; diff Energy = 35.793333</span></span>
-<span id="cb7-54"><a href="#cb7-54"></a><span class="co">#&gt; diff Energy = 39.447522</span></span>
-<span id="cb7-55"><a href="#cb7-55"></a><span class="co">#&gt; diff Energy = 27.375558</span></span>
-<span id="cb7-56"><a href="#cb7-56"></a><span class="co">#&gt; diff Energy = 29.128322</span></span>
-<span id="cb7-57"><a href="#cb7-57"></a><span class="co">#&gt; diff Energy = 38.513857</span></span>
-<span id="cb7-58"><a href="#cb7-58"></a><span class="co">#&gt; diff Energy = 2.135325</span></span>
-<span id="cb7-59"><a href="#cb7-59"></a><span class="co">#&gt; diff Energy = 4.354338</span></span>
-<span id="cb7-60"><a href="#cb7-60"></a><span class="co">#&gt; diff Energy = 23.993038</span></span>
-<span id="cb7-61"><a href="#cb7-61"></a><span class="co">#&gt; diff Energy = 4.470369</span></span>
-<span id="cb7-62"><a href="#cb7-62"></a><span class="co">#&gt; diff Energy = 27.171539</span></span>
-<span id="cb7-63"><a href="#cb7-63"></a><span class="co">#&gt; diff Energy = 32.134548</span></span>
-<span id="cb7-64"><a href="#cb7-64"></a><span class="co">#&gt; diff Energy = 20.125869</span></span>
-<span id="cb7-65"><a href="#cb7-65"></a><span class="co">#&gt; diff Energy = 27.719353</span></span>
-<span id="cb7-66"><a href="#cb7-66"></a><span class="co">#&gt; diff Energy = 30.235583</span></span>
-<span id="cb7-67"><a href="#cb7-67"></a><span class="co">#&gt; diff Energy = 30.182309</span></span>
-<span id="cb7-68"><a href="#cb7-68"></a><span class="co">#&gt; diff Energy = 30.135182</span></span>
-<span id="cb7-69"><a href="#cb7-69"></a><span class="co">#&gt; diff Energy = 30.098038</span></span>
-<span id="cb7-70"><a href="#cb7-70"></a><span class="co">#&gt; diff Energy = 30.069767</span></span>
-<span id="cb7-71"><a href="#cb7-71"></a><span class="co">#&gt; diff Energy = 30.048637</span></span>
-<span id="cb7-72"><a href="#cb7-72"></a><span class="co">#&gt; diff Energy = 30.033026</span></span>
-<span id="cb7-73"><a href="#cb7-73"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-74"><a href="#cb7-74"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-75"><a href="#cb7-75"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-76"><a href="#cb7-76"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-77"><a href="#cb7-77"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-78"><a href="#cb7-78"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-79"><a href="#cb7-79"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-80"><a href="#cb7-80"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-81"><a href="#cb7-81"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-82"><a href="#cb7-82"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-83"><a href="#cb7-83"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-84"><a href="#cb7-84"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-85"><a href="#cb7-85"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-86"><a href="#cb7-86"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-87"><a href="#cb7-87"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-88"><a href="#cb7-88"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-89"><a href="#cb7-89"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-90"><a href="#cb7-90"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-91"><a href="#cb7-91"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-92"><a href="#cb7-92"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-93"><a href="#cb7-93"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-94"><a href="#cb7-94"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-95"><a href="#cb7-95"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-96"><a href="#cb7-96"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-97"><a href="#cb7-97"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-98"><a href="#cb7-98"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-99"><a href="#cb7-99"></a><span class="co">#&gt; diff Energy = 3.184378</span></span>
-<span id="cb7-100"><a href="#cb7-100"></a><span class="co">#&gt; diff Energy = 20.034641</span></span>
-<span id="cb7-101"><a href="#cb7-101"></a><span class="co">#&gt; diff Energy = 4.904329</span></span>
-<span id="cb7-102"><a href="#cb7-102"></a><span class="co">#&gt; diff Energy = 5.154268</span></span>
-<span id="cb7-103"><a href="#cb7-103"></a><span class="co">#&gt; diff Energy = 3.878258</span></span>
-<span id="cb7-104"><a href="#cb7-104"></a><span class="co">#&gt; diff Energy = 0.624879</span></span>
-<span id="cb7-105"><a href="#cb7-105"></a><span class="co">#&gt; diff Energy = 1.208386</span></span>
-<span id="cb7-106"><a href="#cb7-106"></a><span class="co">#&gt; diff Energy = 1.764820</span></span>
-<span id="cb7-107"><a href="#cb7-107"></a><span class="co">#&gt; diff Energy = 5.844396</span></span>
-<span id="cb7-108"><a href="#cb7-108"></a><span class="co">#&gt; diff Energy = 2.804734</span></span>
-<span id="cb7-109"><a href="#cb7-109"></a><span class="co">#&gt; diff Energy = 31.845635</span></span>
-<span id="cb7-110"><a href="#cb7-110"></a><span class="co">#&gt; diff Energy = 13.173246</span></span>
-<span id="cb7-111"><a href="#cb7-111"></a><span class="co">#&gt; diff Energy = 4.959802</span></span>
-<span id="cb7-112"><a href="#cb7-112"></a><span class="co">#&gt; diff Energy = 8.722220</span></span>
-<span id="cb7-113"><a href="#cb7-113"></a><span class="co">#&gt; diff Energy = 14.693575</span></span>
-<span id="cb7-114"><a href="#cb7-114"></a><span class="co">#&gt; diff Energy = 9.888527</span></span>
-<span id="cb7-115"><a href="#cb7-115"></a><span class="co">#&gt; diff Energy = 55.940863</span></span>
-<span id="cb7-116"><a href="#cb7-116"></a><span class="co">#&gt; diff Energy = 39.883318</span></span>
-<span id="cb7-117"><a href="#cb7-117"></a><span class="co">#&gt; diff Energy = 37.679781</span></span>
-<span id="cb7-118"><a href="#cb7-118"></a><span class="co">#&gt; diff Energy = 13.747678</span></span>
-<span id="cb7-119"><a href="#cb7-119"></a><span class="co">#&gt; diff Energy = 14.179673</span></span>
-<span id="cb7-120"><a href="#cb7-120"></a><span class="co">#&gt; diff Energy = 31.627496</span></span>
-<span id="cb7-121"><a href="#cb7-121"></a><span class="co">#&gt; diff Energy = 30.412374</span></span>
-<span id="cb7-122"><a href="#cb7-122"></a><span class="co">#&gt; diff Energy = 30.249404</span></span>
-<span id="cb7-123"><a href="#cb7-123"></a><span class="co">#&gt; diff Energy = 30.155450</span></span>
-<span id="cb7-124"><a href="#cb7-124"></a><span class="co">#&gt; diff Energy = 28.554253</span></span>
-<span id="cb7-125"><a href="#cb7-125"></a><span class="co">#&gt; diff Energy = 34.583086</span></span>
-<span id="cb7-126"><a href="#cb7-126"></a><span class="co">#&gt; diff Energy = 37.588020</span></span>
-<span id="cb7-127"><a href="#cb7-127"></a><span class="co">#&gt; diff Energy = 37.588387</span></span>
-<span id="cb7-128"><a href="#cb7-128"></a><span class="co">#&gt; diff Energy = 0.558545</span></span>
-<span id="cb7-129"><a href="#cb7-129"></a><span class="co">#&gt; diff Energy = 82.532668</span></span>
-<span id="cb7-130"><a href="#cb7-130"></a><span class="co">#&gt; diff Energy = 60.096081</span></span>
-<span id="cb7-131"><a href="#cb7-131"></a><span class="co">#&gt; diff Energy = 8.263505</span></span>
-<span id="cb7-132"><a href="#cb7-132"></a><span class="co">#&gt; diff Energy = 24.594629</span></span>
-<span id="cb7-133"><a href="#cb7-133"></a><span class="co">#&gt; diff Energy = 15.931189</span></span>
-<span id="cb7-134"><a href="#cb7-134"></a><span class="co">#&gt; diff Energy = 22.945647</span></span>
-<span id="cb7-135"><a href="#cb7-135"></a><span class="co">#&gt; diff Energy = 41.900328</span></span>
-<span id="cb7-136"><a href="#cb7-136"></a><span class="co">#&gt; diff Energy = 55.608997</span></span>
-<span id="cb7-137"><a href="#cb7-137"></a><span class="co">#&gt; diff Energy = 50.200922</span></span>
-<span id="cb7-138"><a href="#cb7-138"></a><span class="co">#&gt; diff Energy = 60.808402</span></span>
-<span id="cb7-139"><a href="#cb7-139"></a><span class="co">#&gt; diff Energy = 59.342456</span></span>
-<span id="cb7-140"><a href="#cb7-140"></a><span class="co">#&gt; diff Energy = 51.259283</span></span>
-<span id="cb7-141"><a href="#cb7-141"></a><span class="co">#&gt; diff Energy = 14.828672</span></span>
-<span id="cb7-142"><a href="#cb7-142"></a><span class="co">#&gt; diff Energy = 106.018957</span></span>
-<span id="cb7-143"><a href="#cb7-143"></a><span class="co">#&gt; diff Energy = 28.427274</span></span>
-<span id="cb7-144"><a href="#cb7-144"></a><span class="co">#&gt; diff Energy = 28.344293</span></span>
-<span id="cb7-145"><a href="#cb7-145"></a><span class="co">#&gt; diff Energy = 10.872051</span></span>
-<span id="cb7-146"><a href="#cb7-146"></a><span class="co">#&gt; diff Energy = 10.009909</span></span>
-<span id="cb7-147"><a href="#cb7-147"></a><span class="co">#&gt; diff Energy = 16.045412</span></span>
-<span id="cb7-148"><a href="#cb7-148"></a><span class="co">#&gt; diff Energy = 12.535341</span></span>
-<span id="cb7-149"><a href="#cb7-149"></a><span class="co">#&gt; diff Energy = 16.495630</span></span>
-<span id="cb7-150"><a href="#cb7-150"></a><span class="co">#&gt; diff Energy = 20.293814</span></span>
-<span id="cb7-151"><a href="#cb7-151"></a><span class="co">#&gt; diff Energy = 22.985089</span></span>
-<span id="cb7-152"><a href="#cb7-152"></a><span class="co">#&gt; diff Energy = 16.311522</span></span>
-<span id="cb7-153"><a href="#cb7-153"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-154"><a href="#cb7-154"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-155"><a href="#cb7-155"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-156"><a href="#cb7-156"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-157"><a href="#cb7-157"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-158"><a href="#cb7-158"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-159"><a href="#cb7-159"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-160"><a href="#cb7-160"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-161"><a href="#cb7-161"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-162"><a href="#cb7-162"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-163"><a href="#cb7-163"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-164"><a href="#cb7-164"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-165"><a href="#cb7-165"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-166"><a href="#cb7-166"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-167"><a href="#cb7-167"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-168"><a href="#cb7-168"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-169"><a href="#cb7-169"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-170"><a href="#cb7-170"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-171"><a href="#cb7-171"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-172"><a href="#cb7-172"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-173"><a href="#cb7-173"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-174"><a href="#cb7-174"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-175"><a href="#cb7-175"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-176"><a href="#cb7-176"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-177"><a href="#cb7-177"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-178"><a href="#cb7-178"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-179"><a href="#cb7-179"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-180"><a href="#cb7-180"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-181"><a href="#cb7-181"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-182"><a href="#cb7-182"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-183"><a href="#cb7-183"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-184"><a href="#cb7-184"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-185"><a href="#cb7-185"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-186"><a href="#cb7-186"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-187"><a href="#cb7-187"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-188"><a href="#cb7-188"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-189"><a href="#cb7-189"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-190"><a href="#cb7-190"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-191"><a href="#cb7-191"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-192"><a href="#cb7-192"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-193"><a href="#cb7-193"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-194"><a href="#cb7-194"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-195"><a href="#cb7-195"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-196"><a href="#cb7-196"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-197"><a href="#cb7-197"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-198"><a href="#cb7-198"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-199"><a href="#cb7-199"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-200"><a href="#cb7-200"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-201"><a href="#cb7-201"></a><span class="co">#&gt; ICM Converged at Iteration = 2</span></span>
-<span id="cb7-202"><a href="#cb7-202"></a><span class="co">#&gt; diff Energy = 11.441283</span></span>
-<span id="cb7-203"><a href="#cb7-203"></a><span class="co">#&gt; diff Energy = 11.668752</span></span>
-<span id="cb7-204"><a href="#cb7-204"></a><span class="co">#&gt; diff Energy = 9.184994</span></span>
-<span id="cb7-205"><a href="#cb7-205"></a><span class="co">#&gt; diff Energy = 13.514333</span></span>
-<span id="cb7-206"><a href="#cb7-206"></a><span class="co">#&gt; diff Energy = 9.529188</span></span>
-<span id="cb7-207"><a href="#cb7-207"></a><span class="co">#&gt; diff Energy = 0.158076</span></span>
-<span id="cb7-208"><a href="#cb7-208"></a><span class="co">#&gt; ICM Converged at Iteration = 3</span></span>
-<span id="cb7-209"><a href="#cb7-209"></a><span class="co">#&gt; diff Energy = 0.633251</span></span>
-<span id="cb7-210"><a href="#cb7-210"></a><span class="co">#&gt; diff Energy = 4.560284</span></span>
-<span id="cb7-211"><a href="#cb7-211"></a><span class="co">#&gt; diff Energy = 8.178759</span></span>
-<span id="cb7-212"><a href="#cb7-212"></a><span class="co">#&gt; diff Energy = 4.654479</span></span>
-<span id="cb7-213"><a href="#cb7-213"></a><span class="co">#&gt; diff Energy = 10.096229</span></span>
-<span id="cb7-214"><a href="#cb7-214"></a><span class="co">#&gt; diff Energy = 11.972263</span></span>
-<span id="cb7-215"><a href="#cb7-215"></a><span class="co">#&gt; diff Energy = 20.333914</span></span>
-<span id="cb7-216"><a href="#cb7-216"></a><span class="co">#&gt; diff Energy = 30.238293</span></span>
-<span id="cb7-217"><a href="#cb7-217"></a><span class="co">#&gt; diff Energy = 1.345019</span></span>
-<span id="cb7-218"><a href="#cb7-218"></a><span class="co">#&gt; diff Energy = 2.801115</span></span>
-<span id="cb7-219"><a href="#cb7-219"></a><span class="co">#&gt; diff Energy = 1.295549</span></span>
-<span id="cb7-220"><a href="#cb7-220"></a><span class="co">#&gt; diff Energy = 2.520804</span></span>
-<span id="cb7-221"><a href="#cb7-221"></a><span class="co">#&gt; diff Energy = 5.199557</span></span>
-<span id="cb7-222"><a href="#cb7-222"></a><span class="co">#&gt; diff Energy = 5.760384</span></span>
-<span id="cb7-223"><a href="#cb7-223"></a><span class="co">#&gt; diff Energy = 5.393622</span></span>
-<span id="cb7-224"><a href="#cb7-224"></a><span class="co">#&gt; diff Energy = 64.348873</span></span>
-<span id="cb7-225"><a href="#cb7-225"></a><span class="co">#&gt; diff Energy = 54.697363</span></span>
-<span id="cb7-226"><a href="#cb7-226"></a><span class="co">#&gt; diff Energy = 26.919711</span></span>
-<span id="cb7-227"><a href="#cb7-227"></a><span class="co">#&gt; diff Energy = 16.501381</span></span>
-<span id="cb7-228"><a href="#cb7-228"></a><span class="co">#&gt; diff Energy = 20.227417</span></span>
-<span id="cb7-229"><a href="#cb7-229"></a><span class="co">#&gt; diff Energy = 19.426186</span></span>
-<span id="cb7-230"><a href="#cb7-230"></a><span class="co">#&gt; diff Energy = 32.612922</span></span>
-<span id="cb7-231"><a href="#cb7-231"></a><span class="co">#&gt; diff Energy = 22.563291</span></span>
-<span id="cb7-232"><a href="#cb7-232"></a><span class="co">#&gt; diff Energy = 28.669585</span></span>
-<span id="cb7-233"><a href="#cb7-233"></a><span class="co">#&gt; diff Energy = 104.324066</span></span>
-<span id="cb7-234"><a href="#cb7-234"></a><span class="co">#&gt; diff Energy = 27.066394</span></span>
-<span id="cb7-235"><a href="#cb7-235"></a><span class="co">#&gt; diff Energy = 26.678217</span></span>
-<span id="cb7-236"><a href="#cb7-236"></a><span class="co">#&gt; diff Energy = 32.357453</span></span>
-<span id="cb7-237"><a href="#cb7-237"></a><span class="co">#&gt; diff Energy = 17.194809</span></span>
-<span id="cb7-238"><a href="#cb7-238"></a><span class="co">#&gt; diff Energy = 16.907446</span></span>
-<span id="cb7-239"><a href="#cb7-239"></a><span class="co">#&gt; diff Energy = 9.763298</span></span>
-<span id="cb7-240"><a href="#cb7-240"></a><span class="co">#&gt; diff Energy = 83.250552</span></span>
-<span id="cb7-241"><a href="#cb7-241"></a><span class="co">#&gt; diff Energy = 0.548617</span></span>
-<span id="cb7-242"><a href="#cb7-242"></a><span class="co">#&gt; diff Energy = 10.060693</span></span>
-<span id="cb7-243"><a href="#cb7-243"></a><span class="co">#&gt; diff Energy = 83.705504</span></span>
-<span id="cb7-244"><a href="#cb7-244"></a><span class="co">#&gt; diff Energy = 2.483507</span></span>
-<span id="cb7-245"><a href="#cb7-245"></a><span class="co">#&gt; diff Energy = 26.006222</span></span>
-<span id="cb7-246"><a href="#cb7-246"></a><span class="co">#&gt; diff Energy = 14.077007</span></span>
-<span id="cb7-247"><a href="#cb7-247"></a><span class="co">#&gt; diff Energy = 3.390681</span></span>
-<span id="cb7-248"><a href="#cb7-248"></a><span class="co">#&gt; diff Energy = 67.503274</span></span>
-<span id="cb7-249"><a href="#cb7-249"></a><span class="co">#&gt; diff Energy = 22.559006</span></span>
-<span id="cb7-250"><a href="#cb7-250"></a><span class="co">#&gt; diff Energy = 51.791649</span></span>
-<span id="cb7-251"><a href="#cb7-251"></a><span class="co">#&gt; diff Energy = 32.361058</span></span>
-<span id="cb7-252"><a href="#cb7-252"></a><span class="co">#&gt; diff Energy = 59.183905</span></span>
-<span id="cb7-253"><a href="#cb7-253"></a><span class="co">#&gt; diff Energy = 4.239996</span></span>
-<span id="cb7-254"><a href="#cb7-254"></a><span class="co">#&gt; diff Energy = 86.095106</span></span>
-<span id="cb7-255"><a href="#cb7-255"></a><span class="co">#&gt; diff Energy = 3.341574</span></span>
-<span id="cb7-256"><a href="#cb7-256"></a><span class="co">#&gt; diff Energy = 90.413300</span></span>
-<span id="cb7-257"><a href="#cb7-257"></a><span class="co">#&gt; diff Energy = 10.203158</span></span>
-<span id="cb7-258"><a href="#cb7-258"></a><span class="co">#&gt; diff Energy = 80.536149</span></span>
-<span id="cb7-259"><a href="#cb7-259"></a><span class="co">#&gt; diff Energy = 8.885630</span></span>
-<span id="cb7-260"><a href="#cb7-260"></a><span class="co">#&gt; diff Energy = 91.651611</span></span>
-<span id="cb7-261"><a href="#cb7-261"></a><span class="co">#&gt; diff Energy = 3.897779</span></span>
-<span id="cb7-262"><a href="#cb7-262"></a><span class="kw">str</span>(out)</span>
-<span id="cb7-263"><a href="#cb7-263"></a><span class="co">#&gt; List of 16</span></span>
-<span id="cb7-264"><a href="#cb7-264"></a><span class="co">#&gt;  $ best_K            : int 4</span></span>
-<span id="cb7-265"><a href="#cb7-265"></a><span class="co">#&gt;  $ best_beta         : num 2</span></span>
-<span id="cb7-266"><a href="#cb7-266"></a><span class="co">#&gt;  $ best_cluster_label: num [1:2500] 4 3 3 3 4 4 3 1 2 2 ...</span></span>
-<span id="cb7-267"><a href="#cb7-267"></a><span class="co">#&gt;  $ best_BIC          : num -202250</span></span>
-<span id="cb7-268"><a href="#cb7-268"></a><span class="co">#&gt;  $ best_ell          : num 99013</span></span>
-<span id="cb7-269"><a href="#cb7-269"></a><span class="co">#&gt;  $ best_mu           : num [1:15, 1:4] -1.25 -1.68 -1.23 -1.2 -1.28 ...</span></span>
-<span id="cb7-270"><a href="#cb7-270"></a><span class="co">#&gt;  $ best_sigma        : num [1:15, 1:15, 1:4] 13.10203 0.54826 1.60726 -0.00717 0.29732 ...</span></span>
-<span id="cb7-271"><a href="#cb7-271"></a><span class="co">#&gt;  $ best_gam          : num [1:2500, 1:4] 0.00163 0.01986 0.01624 0.00717 0.00291 ...</span></span>
-<span id="cb7-272"><a href="#cb7-272"></a><span class="co">#&gt;  $ cluster_label     : num [1:2500, 1:6, 1:3] 4 4 3 3 4 2 3 2 2 2 ...</span></span>
-<span id="cb7-273"><a href="#cb7-273"></a><span class="co">#&gt;  $ BIC               : num [1:3, 1:6] -203819 -204602 -205392 -202664 -203388 ...</span></span>
-<span id="cb7-274"><a href="#cb7-274"></a><span class="co">#&gt;   ..- attr(*, &quot;dimnames&quot;)=List of 2</span></span>
-<span id="cb7-275"><a href="#cb7-275"></a><span class="co">#&gt;   .. ..$ : chr [1:3] &quot;K = 4&quot; &quot;K = 5&quot; &quot;K = 6&quot;</span></span>
-<span id="cb7-276"><a href="#cb7-276"></a><span class="co">#&gt;   .. ..$ : chr [1:6] &quot;beta = 0&quot; &quot;beta = 1&quot; &quot;beta = 2&quot; &quot;beta = 3&quot; ...</span></span>
-<span id="cb7-277"><a href="#cb7-277"></a><span class="co">#&gt;  $ ell               : num [1:3, 1:6] 99797 99660 99527 99219 99053 ...</span></span>
-<span id="cb7-278"><a href="#cb7-278"></a><span class="co">#&gt;   ..- attr(*, &quot;dimnames&quot;)=List of 2</span></span>
-<span id="cb7-279"><a href="#cb7-279"></a><span class="co">#&gt;   .. ..$ : chr [1:3] &quot;K = 4&quot; &quot;K = 5&quot; &quot;K = 6&quot;</span></span>
-<span id="cb7-280"><a href="#cb7-280"></a><span class="co">#&gt;   .. ..$ : chr [1:6] &quot;beta = 0&quot; &quot;beta = 1&quot; &quot;beta = 2&quot; &quot;beta = 3&quot; ...</span></span>
-<span id="cb7-281"><a href="#cb7-281"></a><span class="co">#&gt;  $ mu                :List of 3</span></span>
-<span id="cb7-282"><a href="#cb7-282"></a><span class="co">#&gt;   ..$ : num [1:15, 1:4, 1:6] -1.1 -1.59 -1.33 -1.15 -1.22 ...</span></span>
-<span id="cb7-283"><a href="#cb7-283"></a><span class="co">#&gt;   ..$ : num [1:15, 1:5, 1:6] -1.46 -2.03 -1.66 -1.42 -1.26 ...</span></span>
-<span id="cb7-284"><a href="#cb7-284"></a><span class="co">#&gt;   ..$ : num [1:15, 1:6, 1:6] -1.42 -2.22 -1.81 -1.66 -1.3 ...</span></span>
-<span id="cb7-285"><a href="#cb7-285"></a><span class="co">#&gt;  $ sigma             :List of 3</span></span>
-<span id="cb7-286"><a href="#cb7-286"></a><span class="co">#&gt;   ..$ : num [1:15, 1:15, 1:4, 1:6] 13.709 0.935 1.475 0.426 0.572 ...</span></span>
-<span id="cb7-287"><a href="#cb7-287"></a><span class="co">#&gt;   ..$ : num [1:15, 1:15, 1:5, 1:6] 13.854 0.348 0.889 -0.146 0.9 ...</span></span>
-<span id="cb7-288"><a href="#cb7-288"></a><span class="co">#&gt;   ..$ : num [1:15, 1:15, 1:6, 1:6] 13.1556 0.0639 1.0285 -0.2397 1.108 ...</span></span>
-<span id="cb7-289"><a href="#cb7-289"></a><span class="co">#&gt;  $ gam               :List of 3</span></span>
-<span id="cb7-290"><a href="#cb7-290"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:4, 1:6] 0.0042 0.0773 0.2281 0.0963 0.012 ...</span></span>
-<span id="cb7-291"><a href="#cb7-291"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:5, 1:6] 0.000422 0.007368 0.072444 0.043942 0.001958 ...</span></span>
-<span id="cb7-292"><a href="#cb7-292"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:6, 1:6] 8.19e-05 7.88e-03 5.97e-02 2.38e-02 5.53e-04 ...</span></span>
-<span id="cb7-293"><a href="#cb7-293"></a><span class="co">#&gt;  $ pxgn              :List of 3</span></span>
-<span id="cb7-294"><a href="#cb7-294"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:4, 1:6] 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 ...</span></span>
-<span id="cb7-295"><a href="#cb7-295"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:5, 1:6] 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 0.2 ...</span></span>
-<span id="cb7-296"><a href="#cb7-296"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:6, 1:6] 0.167 0.167 0.167 0.167 0.167 ...</span></span>
-<span id="cb7-297"><a href="#cb7-297"></a><span class="co">#&gt;  $ pygx              :List of 3</span></span>
-<span id="cb7-298"><a href="#cb7-298"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:4, 1:6] 40.4 39.2 38.1 48.4 42 ...</span></span>
-<span id="cb7-299"><a href="#cb7-299"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:5, 1:6] 42.7 39.9 39.4 48.6 43.7 ...</span></span>
-<span id="cb7-300"><a href="#cb7-300"></a><span class="co">#&gt;   ..$ : num [1:2500, 1:6, 1:6] 44 40.3 39.3 49.2 45 ...</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>fit =<span class="st"> </span><span class="kw">SC.MEB</span>(y, Adj_sp, <span class="dt">beta_grid =</span> beta_grid, <span class="dt">K_set=</span> K_set, <span class="dt">parallel=</span>parallel, <span class="dt">num_core =</span> num_core, <span class="dt">PX =</span> PX, <span class="dt">maxIter_ICM=</span>maxIter_ICM, <span class="dt">maxIter=</span>maxIter)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">str</span>(fit[,<span class="dv">1</span>])</span></code></pre></div>
 <p>Here, We briefly explain the output of the <code>SC.MEB</code>.</p>
-<p>The item ‘best_K’ is the optimal K we choose according to BIC rule.</p>
-<p>The item ‘best_beta’ is also the optimal beta we choose according to BIC rule.</p>
-<p>The item ‘best_cluster_label’ is the optimal clustering result corresponding to optimal K and optimal beta.</p>
-<p>The item ‘best_BIC’ is the optimal BIC corresponding to optimal K and optimal beta.</p>
-<p>The item ‘best_ell’ is the optimal opposite log-likelihood corresponding to optimal K and optimal beta.</p>
-<p>The item ‘best_mu’ is the optimal mean for each component corresponding to optimal K and optimal beta.</p>
-<p>item ‘best_sigma’ is the optimal variance for each component corresponding to optimal K nd optimal beta.</p>
-<p>The item ‘best_gam’ is the optimal posterior probability matrix corresponding to optimal K and optimal beta.</p>
-<p>The item ‘cluster_label’ is 3-dimensional n<span class="math inline">\(\times\)</span>b<span class="math inline">\(\times\)</span>q matrix, storing all clustering results for each K and beta. n is the number of cells, b is the length of vector ‘bet’, q is the length of vector ‘K’.</p>
-<p>The item ‘BIC’ contains all BIC value for each K and beta.</p>
+<p>The item ‘x’ is clustering label.</p>
 <p>The item ‘ell’ is the opposite log-likelihood for each beta and K.</p>
-<p>The item ‘mu’ is the mean of each component for each beta and K.</p>
-<p>The item ‘sigma’ is the variance of each component for each beta and K.</p>
-<p>The item ‘gam’ is the posterior probability for each beta and K.</p>
+<p>The item ‘mu’ is the mean of each component.</p>
+<p>The item ‘sigma’ is the variance of each component.</p>
+<p>The item ‘gam’ is the posterior probability.</p>
+<p>The item ‘beta’ is the estimated smoothing parameter.</p>
+</div>
+</div>
+<div id="clustering" class="section level3">
+<h3>Clustering</h3>
+<div id="selecting-the-number-of-clusters-using-bic" class="section level4">
+<h4>Selecting the number of clusters using BIC</h4>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">selectKPlot</span>(fit, <span class="dt">K_set =</span> K_set, <span class="dt">criterion =</span> <span class="st">&quot;BIC&quot;</span>)</span></code></pre></div>
+</div>
+<div id="selecting-the-number-of-clusters-using-modified-bic" class="section level4">
+<h4>Selecting the number of clusters using Modified BIC</h4>
+<p>Here we briefly explain how to choose the parameter c in the modified BIC. In general, For the ST or Visium dataset, it often ranges from 0.4 to 1 while for the MERFISH dataset with large number of cells, it often becomes larger, for example 10,20. Most importantly, SC-MEB is fast, scaling well in terms of sample size, which allow the user to tune the c based on their prior knowledge about the tissues or cells.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">selectKPlot</span>(fit, <span class="dt">K_set =</span> K_set, <span class="dt">criterion =</span> <span class="st">&quot;MBIC&quot;</span>)</span></code></pre></div>
+</div>
+<div id="visualizing-spatial-clusters" class="section level4">
+<h4>Visualizing spatial clusters</h4>
+<p>We can plot the cluster assignments over the spatial locations of the spots with ClusterPlot().</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>out =<span class="st"> </span><span class="kw">selectK</span>(fit, <span class="dt">K_set =</span> K_set, <span class="dt">criterion =</span> <span class="st">&quot;BIC&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">ClusterPlot</span>(out, pos)</span></code></pre></div>
+<p>As ClusterPlot() returns a ggplot object, it can be customized by composing with familiar ggplot2 functions.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">ClusterPlot</span>(out, pos) <span class="op">+</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">theme_bw</span>() <span class="op">+</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="kw">xlab</span>(<span class="st">&quot;Row&quot;</span>) <span class="op">+</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="kw">ylab</span>(<span class="st">&quot;Column&quot;</span>) <span class="op">+</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="kw">labs</span>(<span class="dt">title=</span><span class="st">&quot;Spatial clustering&quot;</span>)</span></code></pre></div>
+</div>
+</div>
 </div>
 
 

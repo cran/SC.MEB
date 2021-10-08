@@ -1,9 +1,7 @@
-
 #include <RcppArmadillo.h>
 // [[Rcpp::depends(RcppArmadillo)]]
 
 #include <Rcpp.h>
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -18,20 +16,43 @@ using namespace arma;
 const double log2pi = std::log(2.0 * M_PI);
 
 
-////////////////////////////////////////////////////////////////////////////////
-arma::mat getPairDist(const arma::mat x)	{
+
+//' @title
+//' getneighborhood_fast
+//' @description
+//' an efficient function to find the neighborhood based on the matrix of position and a pre-defined cutoff
+//'
+//' @param x is a n-by-2 matrix of position.
+//' @param cutoff is a threashold of Euclidean distance to decide whether a spot is an neighborhood of another spot. For example, if the Euclidean distance between spot A and B is less than cutoff, then A is taken as the neighbourhood of B. 
+//' @return A sparse matrix containing the neighbourhood
+//' @examples
+//' pos = cbind(rep(1:5, each=5), rep(1:5, 5))
+//' Adj = getneighborhood_fast(pos, 2)
+//' @export
+// [[Rcpp::export]]
+arma::sp_umat getneighborhood_fast(const arma::mat x, double cutoff)	{
 	int N = x.n_rows;
-	arma::mat D(N, N);
-	for (int j = 0; j < N; ++j)
-	{
-		for (int i = j; i < N; ++i)
+    arma::sp_umat D(N, N);
+    double dis;
+    uvec idx, idx2;
+	for (int j = 0; j < N-1; ++j)
+	{    
+        idx = find(abs(x(j,0) - x.col(0))<cutoff); 
+        idx2 = find(idx>j);
+        int p = idx2.n_elem;
+		for (int i = 0; i < p; ++i)
 		{
-			D(i, j)	= norm(x.row(i) - x.row(j), 2);
-			D(j, i) = D(i, j);
+            dis = norm(x.row(idx(idx2(i))) - x.row(j), 2);
+            if (dis < cutoff){
+                D(idx(idx2(i)),j) = 1;
+                D(j,idx(idx2(i))) = 1;
+            }
 		}
 	}
 	return D;
 }
+
+
 
 double elbo(arma::mat& U, arma::mat& gam)	{
    return accu(U % gam) + accu(gam % log(gam + (gam==0)));
@@ -48,14 +69,12 @@ vec dmvnrm(const mat& x,
            mat sigma, 
            bool logd = false,
            int cores = 1) { 
-    omp_set_num_threads(cores);
     int n = x.n_rows;
     int xdim = x.n_cols;
     vec out(n);
     mat rooti = inv(chol(sigma, "lower"));
     double rootisum = sum(log(rooti.diag()));
     double constants = -(xdim/2) * log2pi;
-    #pragma omp parallel for schedule(static) 
     for (int i=0; i < n; i++) {
         vec z = rooti * trans( x.row(i) - mean) ;    
         out(i)      = constants - 0.5 * sum(z%z) + rootisum;     
@@ -79,6 +98,8 @@ sp_mat get_spNbs(ivec x, const sp_mat& Adj) {
     // Calculate number of nonzero points
     //int n = std::distance(start, end);
     int n = Adj.n_nonzero;
+    //cout << "n=" << n << endl;
+    //cout << "n=" << Adj.n_nonzero << endl;
 
 	sp_mat spNbs(x.n_elem, x.n_elem);    //neiborhood state matrix, matched with Adj.
 
@@ -140,14 +161,25 @@ arma::mat calXenergy2D_sp(arma::ivec x, const arma::sp_mat& Adj, int K, const ar
 				//n_nb++;
 			}
 			Ux(i, k) = alpha(k) + beta * (nn - n_sameS)/2;
+			//cout << "n_nb = " << n_nb << endl;
+			//cout << "n_nb = " << n << endl;
+
 		}
 	}
+	//cout << "Ux = " << accu(Ux) << endl;
 	return Ux;
 
 }
 
 
- 
+
+double obj_beta(const arma::ivec& y, const arma::mat& gam, const arma::sp_mat& Adj, int K, const arma::vec alpha, const double beta)	{
+  
+  mat Ux = calXenergy2D_sp(y, Adj, K, alpha, beta); // Uy was normalized, so there is no need to normalized Uy. 
+  mat pxgn = normalise(exp(-Ux), 1, 1); // set all rowSums to be ONE.
+  return accu(gam % (log(pxgn)));
+}
+
 Rcpp::List runICM_sp (const arma::mat &y, arma::ivec x, arma::mat mu, arma::cube sigma, const arma::sp_mat& Adj,
 			arma::vec alpha, double beta, int maxIter_ICM)	{
 	int n = y.n_rows, K = mu.n_cols;
@@ -200,6 +232,7 @@ Rcpp::List runICM_sp (const arma::mat &y, arma::ivec x, arma::mat mu, arma::cube
 	vec energy = Energy.subvec(1, Iteration);
 	
 	arma::mat pxgn = normalise(exp(-Ux), 1, 1); // set all rowSums to be ONE.
+    
 
 	List output = List::create(
 		Rcpp::Named("x") = x,
@@ -274,13 +307,26 @@ mat runEstep(mat Uy, mat pxgn)	{
 }
 
 
+
+//call pchisq from stat package
+List Mclust2(arma::mat y, int G){
+
+  // get namespace of package
+  Rcpp::Environment pkg = Environment::namespace_env("mclust");
+  // get function from package
+  Rcpp::Function f = pkg["Mclust"];
+  
+  return f(_["data"]=y, _["G"]=G);
+}
+
  
+
 // [[Rcpp::export]]
-List	gmrfICMEM(const arma::mat& y, const arma::ivec& x_int, const arma::sp_mat& Adj,
+List	ICMEM(const arma::mat& y, const arma::ivec& x_int, const arma::sp_mat& Adj,
 			   const arma::mat& mu_int, const arma::cube& sigma_int, 
-			   const arma::vec& alpha, 	const double&  beta,
+			   const arma::vec& alpha, 	const arma::vec&  beta_grid,
 	 	  	   const bool& PX,          const int& maxIter_ICM, const int& maxIter)
-{
+{ 
 	int n = y.n_rows, K = mu_int.n_cols; //, p = y.n_cols;
 	mat mu = mu_int;
 	cube sigma = sigma_int;
@@ -297,6 +343,7 @@ List	gmrfICMEM(const arma::mat& y, const arma::ivec& x_int, const arma::sp_mat& 
 	vec LogLik(maxIter);
    	LogLik(0) = INFINITY;
    	int iter, k;
+    double beta = 2;
 	//--------------------------------------------------------------------------------	
 	// EM algrithm
 	//--------------------------------------------------------------------------------
@@ -318,6 +365,15 @@ List	gmrfICMEM(const arma::mat& y, const arma::ivec& x_int, const arma::sp_mat& 
 		// E-step, update gamma.
 		
 		gam = runEstep(Uy, pxgn);
+    
+        // update beta: grid search.
+        int ng_beta = beta_grid.n_elem;
+        vec objBetaVec(ng_beta);
+        for(k=0; k < ng_beta; ++k){
+            objBetaVec(k) = obj_beta(x, gam, Adj, K, alpha, beta_grid(k));
+        }
+        
+        beta = beta_grid(index_max(objBetaVec));
 
 		// M-step 
 		for (k = 0; k < K; k ++)	{
@@ -338,6 +394,7 @@ List	gmrfICMEM(const arma::mat& y, const arma::ivec& x_int, const arma::sp_mat& 
 		//if (abs(LogLik(iter) - LogLik(iter - 1)) < 1e-5 || rcond(sigma) < 1e-7) {
 		if (abs(LogLik(iter) - LogLik(iter - 1)) < 1e-5) {
 Rprintf("Converged at Iteration = %d\n", iter);
+
 			break;
 		}
 	}
@@ -361,13 +418,13 @@ Rprintf("Converged at Iteration = %d\n", iter);
 		Rcpp::Named("pygx") = pygx,
 		Rcpp::Named("mu") = mu,
 		Rcpp::Named("sigma") = sigma,
+        Rcpp::Named("beta") = beta,
 		Rcpp::Named("ell") = ell,
 		Rcpp::Named("loglik") = loglik);
 
 	return output; 
 
 }
-
 
  
 
